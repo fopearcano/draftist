@@ -1,1 +1,10 @@
-{"scripts":{"dev":"vite --host 0.0.0.0","build":"vite build"},"dependencies":{"vite":"latest","react":"latest","react-dom":"latest","lucide-react":"latest"},"devDependencies":{}}
+{
+  "name": "draftist",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/server.mjs",
+    "build": "node scripts/build.mjs"
+  }
+}

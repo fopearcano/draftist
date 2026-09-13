@@ -6,19 +6,20 @@ bible, comments, and paper, sepia, and night viewing presets.
 
 ## Run locally
 
-The application requires Node.js 20 or newer and npm:
+The application requires Node.js 20 or newer. It intentionally has no runtime or
+build dependencies, so a package download is not required:
 
 ```bash
-npm install
 npm run dev
 ```
 
-Vite prints the local URL after the development server starts.
+The development server prints the local URL after it starts.
 
 ## Browser runtime
 
-A normal locally installed browser can open the Vite URL. For automated browser
-checks and screenshots, install Playwright and its managed Chromium runtime:
+A normal locally installed browser can open the development URL. For automated
+browser checks and screenshots, Playwright is optional. Install it and its
+managed Chromium runtime only when browser automation is needed:
 
 ```bash
 npm install --save-dev playwright
@@ -38,6 +39,13 @@ sudo apt-get install chromium
 ```
 
 Playwright-managed Chromium is recommended for reproducible automated checks.
+
+## Why there is no `npm install` step
+
+Draftist uses browser-native JavaScript and small Node-based development and build
+scripts. This makes first-run setup instant in restricted or offline environments.
+Running `npm install` is safe but unnecessary; npm should report that the project
+is already up to date without downloading application packages.
 
 ## Production build
 
