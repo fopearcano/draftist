@@ -1,5 +1,3 @@
-import './styles.css';
-
 const icon = (name) => `<span class="ui-icon" aria-hidden="true">${name}</span>`;
 const outline = [
   ['The Arrival', '1,284', false], ['A familiar stranger', '', true],
