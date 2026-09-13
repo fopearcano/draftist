@@ -19,6 +19,25 @@ The development server listens on all network interfaces on port `5146`. Open
 If the second address is not reachable, allow inbound TCP port `5146` in the host
 firewall and confirm that both devices are connected to the same LAN.
 
+### If npm reports `Missing script: "dev"`
+
+That message means npm is reading a different `package.json`, usually because the
+terminal is not inside the Draftist repository or because the local checkout is
+out of date. Change into the directory containing this README and verify the
+available scripts before starting:
+
+```bash
+cd /path/to/draftist
+npm run
+npm run doctor
+npm run dev
+```
+
+`npm run` must list `dev`, `start`, `build`, `test`, and `doctor`. You can also
+start Draftist with `npm start`. If `dev` is not listed, update or re-download the
+repository; reinstalling packages will not add a missing script to an old or
+unrelated `package.json`.
+
 To use a different port temporarily, set `PORT` when starting the server:
 
 ```bash

@@ -6,6 +6,11 @@ const [html, script, css] = await Promise.all([
   readFile('src/main.js', 'utf8'),
   readFile('src/styles.css', 'utf8'),
 ]);
+const packageJson = JSON.parse(await readFile('package.json', 'utf8'));
+
+assert.equal(packageJson.scripts.dev, 'node scripts/server.mjs');
+assert.equal(packageJson.scripts.start, packageJson.scripts.dev);
+assert.equal(packageJson.scripts.doctor, 'node scripts/doctor.mjs');
 
 assert.match(html, /rel="stylesheet" href="\/src\/styles\.css"/);
 assert.match(html, /type="module" src="\/src\/main\.js"/);
