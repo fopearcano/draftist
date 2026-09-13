@@ -9,10 +9,8 @@ const [html, script, css] = await Promise.all([
 
 assert.match(html, /rel="stylesheet" href="\/src\/styles\.css"/);
 assert.match(html, /type="module" src="\/src\/main\.js"/);
-for (const feature of ['data-mode="novel"', 'data-mode="screenplay"', 'data-mode="graphic"']) {
-  assert.ok(script.includes(feature), `missing writing mode: ${feature}`);
-}
-for (const view of ['contracted', 'expanded', 'focus', 'typewriter', 'inverted', 'grayscale']) {
+assert.ok(!script.includes('data-mode='), 'Draftist must remain a novel-only workspace');
+for (const view of ['contracted', 'expanded', 'focus', 'focus-wide', 'typewriter', 'inverted', 'grayscale', 'retro', 'future']) {
   assert.ok(script.includes(`data-view="${view}"`), `missing viewing preset: ${view}`);
 }
 for (const entity of ['character', 'place', 'object', 'music', 'sound']) {
@@ -33,6 +31,11 @@ assert.match(script, /const icons = \{/);
 assert.match(script, /class="menu-icon"/);
 assert.match(script, /function rememberSelection/, 'formatting controls must preserve and reflect the editor selection');
 assert.match(script, /aria-expanded/, 'project menu must expose its open state');
+assert.ok(script.includes('Chapter (H1)') && script.includes('Section (H2)'), 'toolbar structure names must match the outline');
+assert.match(script, /data-side="help"/);
+assert.match(script, /function changeZoom/);
+assert.match(script, /overall-italic/);
+assert.match(script, /event\.metaKey\|\|event\.ctrlKey/, 'global shortcuts must work on macOS and other platforms');
 assert.match(script, /function centerTypewriterCaret/, 'typewriter mode must keep the caret centered');
 assert.match(script, /\$\$\('h1,h2'/, 'outline must derive from document headings');
 assert.match(script, /canvas\.scrollTo/, 'outline navigation must scroll only the editor canvas');
@@ -47,6 +50,9 @@ assert.match(css, /\.workspace\{overflow:hidden\}/, 'the application viewport mu
 assert.match(css, /\.view-expanded \.workspace/);
 assert.match(css, /\.view-inverted/);
 assert.match(css, /\.view-grayscale\{filter:grayscale\(1\)\}/);
+assert.match(css, /\.view-retro/);
+assert.match(css, /\.view-future/);
+assert.match(css, /\.view-focus-wide/);
 assert.match(css, /@media print/);
 assert.match(css, /\.paper \*\{color:#000!important;background:transparent!important/);
 console.log('Draftist feature checks passed');
