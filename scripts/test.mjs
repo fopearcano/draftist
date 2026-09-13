@@ -12,7 +12,7 @@ assert.match(html, /type="module" src="\/src\/main\.js"/);
 for (const feature of ['data-mode="novel"', 'data-mode="screenplay"', 'data-mode="graphic"']) {
   assert.ok(script.includes(feature), `missing writing mode: ${feature}`);
 }
-for (const view of ['page', 'flow', 'focus', 'typewriter']) {
+for (const view of ['contracted', 'expanded', 'focus', 'typewriter', 'inverted', 'grayscale']) {
   assert.ok(script.includes(`data-view="${view}"`), `missing viewing preset: ${view}`);
 }
 for (const entity of ['character', 'place', 'object', 'music', 'sound']) {
@@ -23,6 +23,12 @@ assert.match(css, /\.story-glyph\.music/);
 assert.match(css, /\.story-glyph\.sound/);
 assert.ok(script.includes('id="import-button"') && script.includes('id="export-button"'), 'missing import/export controls');
 assert.ok(!script.includes('id="share-button"'), 'obsolete share control is still present');
+for (const command of ['italic', 'strikeThrough', 'removeFormat', 'insertOrderedList', 'justifyCenter']) {
+  assert.ok(script.includes(`data-cmd="${command}"`), `missing formatting command: ${command}`);
+}
+assert.ok(script.includes('Atkinson Hyperlegible') && script.includes('OpenDyslexic'), 'accessible font choices are missing');
+assert.match(script, /id="focus-exit"/);
+assert.match(script, /event\.key==='Escape'.*view-focus/, 'focus mode must support Escape');
 assert.match(script, /function centerTypewriterCaret/, 'typewriter mode must keep the caret centered');
 assert.match(script, /\$\$\('h1,h2'/, 'outline must derive from document headings');
 assert.match(script, /canvas\.scrollTo/, 'outline navigation must scroll only the editor canvas');
@@ -34,6 +40,9 @@ assert.match(script, /function removeHeading/, 'outline headings must be removab
 assert.ok(!script.includes("prompt('Rename heading'"), 'heading names should be edited inline, not through a prompt');
 assert.match(css, /\.workspace,.editor-shell,.canvas\{min-height:0\}/, 'nested editor flex containers must permit canvas scrolling');
 assert.match(css, /\.workspace\{overflow:hidden\}/, 'the application viewport must remain fixed while the canvas scrolls');
+assert.match(css, /\.view-expanded \.workspace/);
+assert.match(css, /\.view-inverted/);
+assert.match(css, /\.view-grayscale\{filter:grayscale\(1\)\}/);
 assert.match(css, /@media print/);
 assert.match(css, /\.paper \*\{color:#000!important;background:transparent!important/);
 console.log('Draftist feature checks passed');

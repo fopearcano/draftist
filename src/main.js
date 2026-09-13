@@ -25,7 +25,7 @@ const manuscripts = {
 
 const root = $('#root');
 root.innerHTML = `
-<div class="app view-page mode-novel" data-theme="light">
+<div class="app view-contracted mode-novel" data-theme="light">
   <header class="topbar">
     <button class="brand" id="projects-toggle" aria-label="Open projects"><span class="logo">D</span><span>Draftist</span><span class="chevron">⌄</span></button>
     <div class="document-title"><input value="The Cartographer’s Daughter" aria-label="Document title"><span id="save-state">All changes saved</span></div>
@@ -40,14 +40,15 @@ root.innerHTML = `
       <div class="project-summary"><span>PROJECT</span><strong>The Cartographer’s Daughter</strong><small><span id="total-words">0</span> words · 3 chapters</small></div>
     </aside>
     <main class="editor-shell">
-      <div class="modebar"><span>Writing mode</span><div class="segmented" id="mode-picker"><button class="active" data-mode="novel">Novel</button><button data-mode="screenplay">Screenplay</button><button data-mode="graphic">Graphic novel</button></div><span class="menu-divider"></span><span>View</span><div class="segmented" id="view-picker"><button class="active" data-view="page">Page</button><button data-view="flow">Flow</button><button data-view="focus">Focus</button><button data-view="typewriter">Typewriter</button></div><span class="mode-hint" id="mode-hint">Prose & chapters</span></div>
-      <div class="toolbar" role="toolbar" aria-label="Text formatting"><button data-cmd="undo">↶</button><button data-cmd="redo">↷</button><i></i><select id="block-format" aria-label="Text style"><option value="p">Paragraph</option><option value="h1">Heading 1</option><option value="h2">Heading 2</option><option value="blockquote">Quote</option></select><select id="font-family" aria-label="Font"><option value="Literata">Literata</option><option value="Georgia">Georgia</option><option value="Arial">Arial</option><option value="Courier New">Courier</option></select><button data-cmd="bold"><b>B</b></button><button data-cmd="italic"><i>I</i></button><button data-cmd="underline"><u>U</u></button><button data-cmd="insertUnorderedList">☷</button><label class="color-control" title="Text color">A<input type="color" id="text-color" value="#322f30"></label><label class="color-control highlight" title="Highlight color">●<input type="color" id="highlight-color" value="#f7d774"></label><div class="toolbar-space"></div><button id="focus-toggle">✦ Focus</button></div>
+      <div class="modebar"><span>Writing mode</span><div class="segmented" id="mode-picker"><button class="active" data-mode="novel">Novel</button><button data-mode="screenplay">Screenplay</button><button data-mode="graphic">Graphic novel</button></div><span class="menu-divider"></span><span>View</span><div class="segmented view-segments" id="view-picker"><button class="active" data-view="contracted">Contracted</button><button data-view="expanded">Expanded</button><button data-view="focus">Focus</button><button data-view="typewriter">Typewriter</button><button data-view="inverted">Inverted</button><button data-view="grayscale">B&amp;W</button></div></div>
+      <div class="toolbar" role="toolbar" aria-label="Text formatting"><button data-cmd="undo" title="Undo">↶</button><button data-cmd="redo" title="Redo">↷</button><i></i><select id="block-format" aria-label="Text style"><option value="p">Paragraph</option><option value="h1">Heading 1</option><option value="h2">Heading 2</option><option value="blockquote">Quote</option></select><select id="font-family" aria-label="Font"><option value="Literata">Literata</option><option value="Georgia">Georgia</option><option value="Garamond">Garamond</option><option value="Times New Roman">Times New Roman</option><option value="Arial">Arial</option><option value="Helvetica">Helvetica</option><option value="Verdana">Verdana</option><option value="Trebuchet MS">Trebuchet</option><option value="Atkinson Hyperlegible">Atkinson Hyperlegible</option><option value="OpenDyslexic">OpenDyslexic</option><option value="Courier New">Courier</option></select><button data-cmd="bold" title="Bold"><b>B</b></button><button data-cmd="italic" title="Italic"><i>I</i></button><button data-cmd="underline" title="Underline"><u>U</u></button><button data-cmd="strikeThrough" title="Strikethrough"><s>S</s></button><button data-cmd="removeFormat" title="Clear formatting">Tx</button><i></i><button data-cmd="insertUnorderedList" title="Bulleted list">•≡</button><button data-cmd="insertOrderedList" title="Numbered list">1≡</button><button data-cmd="justifyLeft" title="Align left">≡</button><button data-cmd="justifyCenter" title="Align center">≡</button><button data-cmd="justifyRight" title="Align right">≡</button><label class="color-control" title="Text color">A<input type="color" id="text-color" value="#322f30"></label><label class="color-control highlight" title="Highlight color">●<input type="color" id="highlight-color" value="#f7d774"></label><div class="toolbar-space"></div><button id="focus-toggle">✦ Focus</button></div>
       <div class="canvas"><article id="editor" class="paper" contenteditable="true" spellcheck="true" aria-label="Manuscript editor">${manuscripts.novel}</article></div>
       <footer class="statusbar"><span id="section-status">The Arrival</span><span id="word-count">0 words</span><span id="reading-time">0 min read</span><span class="save-ok">✓ Saved locally</span></footer>
     </main>
     <aside class="comments-panel"><div class="comments-header"><b>Comments</b><button id="comments-close">×</button></div><div class="selection-quote">“the uncomfortable sense that someone had been waiting for her.”</div><div id="comments-list"><article class="comment"><div><span class="avatar small">Y</span><b>You</b><small>2 min ago</small></div><p>Lean into the unease here. Why does she recognize the handwriting?</p><button class="resolve">✓ Resolve</button></article></div><div class="comment-compose"><textarea id="comment-input" placeholder="Add a comment…"></textarea><button id="add-comment">Comment</button></div></aside>
   </div>
   <div class="toast" hidden></div>
+  <button class="focus-exit" id="focus-exit">Exit focus <kbd>Esc</kbd></button>
 </div>`;
 
 const app = $('.app');
@@ -101,6 +102,7 @@ function setMode(mode) { if(!confirm('Switch writing mode? The sample layout wil
 function saveDraft(){ $('#save-state').textContent='Saving…';clearTimeout(saveTimer);saveTimer=setTimeout(()=>{try{localStorage.setItem('draftist-document',editor.innerHTML);}catch{}$('#save-state').textContent='All changes saved';},350); }
 function toggleComments(){app.classList.toggle('comments-hidden');}
 function centerTypewriterCaret(){if(!app.classList.contains('view-typewriter'))return;const selection=getSelection();if(!selection?.rangeCount)return;const caret=selection.getRangeAt(0).getBoundingClientRect();const canvas=$('.canvas').getBoundingClientRect();if(caret.height) $('.canvas').scrollBy({top:caret.top-(canvas.top+canvas.height/2),behavior:'smooth'});}
+function setView(view){app.classList.remove('view-contracted','view-expanded','view-focus','view-typewriter','view-inverted','view-grayscale');app.classList.add(`view-${view}`);$$('[data-view]').forEach(button=>button.classList.toggle('active',button.dataset.view===view));if(view==='typewriter')centerTypewriterCaret();}
 
 renderProjects(); renderStory(); updateOutline(); updateStats();
 $$('[data-side]').forEach(b=>b.addEventListener('click',()=>setSide(b.dataset.side)));
@@ -121,8 +123,10 @@ $('#font-family').addEventListener('change',e=>{document.execCommand('fontName',
 $('#text-color').addEventListener('input',e=>document.execCommand('foreColor',false,e.target.value));
 $('#highlight-color').addEventListener('input',e=>document.execCommand('hiliteColor',false,e.target.value));
 $$('[data-mode]').forEach(b=>b.addEventListener('click',()=>{if(!b.classList.contains('active'))setMode(b.dataset.mode);}));
-$$('[data-view]').forEach(b=>b.addEventListener('click',()=>{app.classList.remove('view-page','view-flow','view-focus','view-typewriter');app.classList.add(`view-${b.dataset.view}`);$$('[data-view]').forEach(x=>x.classList.toggle('active',x===b));}));
-$('#focus-toggle').addEventListener('click',()=>{$('[data-view="focus"]').click();});
+$$('[data-view]').forEach(b=>b.addEventListener('click',()=>setView(b.dataset.view)));
+$('#focus-toggle').addEventListener('click',()=>setView('focus'));
+$('#focus-exit').addEventListener('click',()=>setView('contracted'));
+document.addEventListener('keydown',event=>{if(event.key==='Escape'&&app.classList.contains('view-focus'))setView('contracted');});
 editor.addEventListener('input',()=>{updateStats();updateOutline();saveDraft();centerTypewriterCaret();});
 editor.addEventListener('keyup',centerTypewriterCaret);
 $('.canvas').addEventListener('scroll',syncOutlineToScroll,{passive:true});
