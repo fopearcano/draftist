@@ -13,7 +13,17 @@ build dependencies, so a package download is not required:
 npm run dev
 ```
 
-The development server prints the local URL after it starts.
+The development server listens on all network interfaces on port `5146`. Open
+`http://localhost:5146` on the same computer, or use
+`http://<this-computer's-LAN-IP>:5146` from another device on the local network.
+If the second address is not reachable, allow inbound TCP port `5146` in the host
+firewall and confirm that both devices are connected to the same LAN.
+
+To use a different port temporarily, set `PORT` when starting the server:
+
+```bash
+PORT=8080 npm run dev
+```
 
 ## Browser runtime
 
