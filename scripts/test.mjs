@@ -15,9 +15,12 @@ for (const feature of ['data-mode="novel"', 'data-mode="screenplay"', 'data-mode
 for (const view of ['page', 'flow', 'focus', 'typewriter']) {
   assert.ok(script.includes(`data-view="${view}"`), `missing viewing preset: ${view}`);
 }
-for (const entity of ['character', 'place', 'object']) {
+for (const entity of ['character', 'place', 'object', 'music', 'sound']) {
   assert.ok(script.includes(`entity ${entity}`), `missing entity styling: ${entity}`);
 }
+assert.ok(script.includes('data-filter="music"') && script.includes('data-filter="sound"'), 'story bible must filter music and sounds');
+assert.match(css, /\.story-glyph\.music/);
+assert.match(css, /\.story-glyph\.sound/);
 assert.ok(script.includes('id="import-button"') && script.includes('id="export-button"'), 'missing import/export controls');
 assert.ok(!script.includes('id="share-button"'), 'obsolete share control is still present');
 assert.match(script, /function centerTypewriterCaret/, 'typewriter mode must keep the caret centered');
