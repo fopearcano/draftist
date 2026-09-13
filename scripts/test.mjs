@@ -18,6 +18,9 @@ for (const view of ['page', 'flow', 'focus', 'typewriter']) {
 for (const entity of ['character', 'place', 'object']) {
   assert.ok(script.includes(`entity ${entity}`), `missing entity styling: ${entity}`);
 }
+assert.ok(script.includes('id="import-button"') && script.includes('id="export-button"'), 'missing import/export controls');
+assert.ok(!script.includes('id="share-button"'), 'obsolete share control is still present');
+assert.match(script, /function centerTypewriterCaret/, 'typewriter mode must keep the caret centered');
 assert.match(script, /\$\$\('h1,h2'/, 'outline must derive from document headings');
 assert.match(css, /@media print/);
 assert.match(css, /\.paper \*\{color:#000!important;background:transparent!important/);
