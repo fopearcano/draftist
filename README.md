@@ -26,12 +26,29 @@ npm install --save-dev playwright
 npx playwright install --with-deps chromium
 ```
 
-The second command installs Chromium as well as the Linux system libraries it
-needs. If system packages cannot be installed from an unprivileged shell, run it
-with the privileges appropriate for your development machine or ask the
-environment administrator to provide Chromium and its dependencies.
+The second command installs Chromium as well as the system libraries it needs.
+`--with-deps` is primarily intended for supported Linux hosts and can require
+administrator privileges.
 
-To install only the operating-system browser on Ubuntu or Debian instead, use:
+### macOS 12
+
+Recent Playwright releases do not provide a managed Chromium build for macOS 12.
+If the installer reports `Playwright does not support chromium on mac12`, the
+Draftist application is still usable: run `npm run dev` and open the printed URL
+in Safari, Chrome, Firefox, or Edge. No Playwright browser download is needed for
+normal development.
+
+For automated Playwright checks, use one of these supported approaches instead:
+
+1. Upgrade the Mac to a macOS release supported by the current Playwright version,
+   then run `npx playwright install chromium`.
+2. Run the checks in a supported Linux CI runner or Playwright Docker container.
+
+Avoid pinning an obsolete Playwright version merely to obtain an old macOS 12
+browser binary, because that also pins an outdated browser engine. The operating
+system browser is the safer option for local manual testing on that Mac.
+
+To install only the operating-system browser on Ubuntu or Debian, use:
 
 ```bash
 sudo apt-get update
