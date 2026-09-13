@@ -59,9 +59,27 @@ function updateStats() { const words=(editor.innerText.match(/\b[\w’'-]+\b/g)|
 function updateOutline() {
   const headings=$$('h1,h2',editor); const list=$('#outline-list');
   list.innerHTML=headings.length?headings.map((heading,index)=>`<button class="outline-item level-${heading.tagName.toLowerCase()} ${index===0?'active':''}" data-heading="${index}"><span>${heading.tagName==='H1'?'⌄':''} ${escapeHtml(heading.textContent||'Untitled')}</span></button>`).join(''):'<p class="empty">Add headings to build your outline.</p>';
-  $$('.outline-item',list).forEach(button=>button.addEventListener('click',()=>headings[Number(button.dataset.heading)].scrollIntoView({behavior:'smooth',block:'center'})));
+  $$('.outline-item',list).forEach(button=>button.addEventListener('click',()=>navigateToHeading(headings[Number(button.dataset.heading)],button)));
 }
-function renderStory() { const query=$('#story-search').value.toLowerCase(); const visible=storyItems.filter(item=>(currentFilter==='all'||item.type===currentFilter)&&item.name.toLowerCase().includes(query)); $('#story-list').innerHTML=visible.map(item=>`<button class="story-item" data-name="${item.name}"><span class="story-glyph ${item.type}">${item.glyph}</span><span><b>${item.name}</b><small>${item.type}</small></span><i class="tag-dot ${item.type}"></i></button>`).join('')||'<p class="empty">No story items found.</p>'; $$('.story-item').forEach(button=>button.addEventListener('click',()=>{const match=$(`[data-entity="${button.dataset.name}"]`,editor);if(match){match.scrollIntoView({behavior:'smooth',block:'center'});match.classList.add('pulse');setTimeout(()=>match.classList.remove('pulse'),1200);}else toast('Item is not used in this draft');})); }
+function navigateToHeading(heading,button){
+  scrollEditorTarget(heading);
+  $$('.outline-item').forEach(item=>item.classList.toggle('active',item===button));
+  $('#section-status').textContent=heading.textContent||'Untitled section';
+  editor.focus({preventScroll:true});
+}
+function scrollEditorTarget(target,center=false){
+  const canvas=$('.canvas');
+  const top=editor.offsetTop+target.offsetTop-(center?canvas.clientHeight/2:48);
+  canvas.scrollTo({top:Math.max(0,top),behavior:'smooth'});
+}
+function syncOutlineToScroll(){
+  const canvas=$('.canvas'); const headings=$$('h1,h2',editor); if(!headings.length)return;
+  const position=canvas.scrollTop-editor.offsetTop+80;
+  let active=0; headings.forEach((heading,index)=>{if(heading.offsetTop<=position)active=index;});
+  $$('.outline-item').forEach((item,index)=>item.classList.toggle('active',index===active));
+  $('#section-status').textContent=headings[active].textContent||'Untitled section';
+}
+function renderStory() { const query=$('#story-search').value.toLowerCase(); const visible=storyItems.filter(item=>(currentFilter==='all'||item.type===currentFilter)&&item.name.toLowerCase().includes(query)); $('#story-list').innerHTML=visible.map(item=>`<button class="story-item" data-name="${item.name}"><span class="story-glyph ${item.type}">${item.glyph}</span><span><b>${item.name}</b><small>${item.type}</small></span><i class="tag-dot ${item.type}"></i></button>`).join('')||'<p class="empty">No story items found.</p>'; $$('.story-item').forEach(button=>button.addEventListener('click',()=>{const match=$(`[data-entity="${button.dataset.name}"]`,editor);if(match){scrollEditorTarget(match,true);match.classList.add('pulse');setTimeout(()=>match.classList.remove('pulse'),1200);}else toast('Item is not used in this draft');})); }
 function renderProjects() { $('#project-list').innerHTML=projects.map((project,index)=>`<button class="project-row ${index===0?'current':''}"><span class="project-cover">${project.title[0]}</span><span><b>${project.title}</b><small>${project.meta}</small></span>${index===0?'<i>✓</i>':''}</button>`).join(''); }
 function setSide(name) { $$('[data-side]').forEach(b=>b.classList.toggle('active',b.dataset.side===name)); $('#outline-view').hidden=name!=='outline'; $('#story-view').hidden=name!=='story'; }
 function setMode(mode) { if(!confirm('Switch writing mode? The sample layout will replace the current editor content.')) return; editor.innerHTML=manuscripts[mode]; app.classList.remove('mode-novel','mode-screenplay','mode-graphic');app.classList.add(`mode-${mode}`);$$('[data-mode]').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));$('#mode-hint').textContent={novel:'Prose & chapters',screenplay:'Scenes & dialogue',graphic:'Pages & panels'}[mode]; updateOutline();updateStats();saveDraft(); }
@@ -92,5 +110,6 @@ $$('[data-view]').forEach(b=>b.addEventListener('click',()=>{app.classList.remov
 $('#focus-toggle').addEventListener('click',()=>{$('[data-view="focus"]').click();});
 editor.addEventListener('input',()=>{updateStats();updateOutline();saveDraft();centerTypewriterCaret();});
 editor.addEventListener('keyup',centerTypewriterCaret);
+$('.canvas').addEventListener('scroll',syncOutlineToScroll,{passive:true});
 $('#comments-list').addEventListener('click',e=>{if(e.target.closest('.resolve'))e.target.closest('.comment').remove();});
 $('#add-comment').addEventListener('click',()=>{const input=$('#comment-input');if(!input.value.trim())return;$('#comments-list').insertAdjacentHTML('beforeend',`<article class="comment"><div><span class="avatar small">Y</span><b>You</b><small>Just now</small></div><p>${escapeHtml(input.value)}</p><button class="resolve">✓ Resolve</button></article>`);input.value='';});

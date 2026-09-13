@@ -22,6 +22,9 @@ assert.ok(script.includes('id="import-button"') && script.includes('id="export-b
 assert.ok(!script.includes('id="share-button"'), 'obsolete share control is still present');
 assert.match(script, /function centerTypewriterCaret/, 'typewriter mode must keep the caret centered');
 assert.match(script, /\$\$\('h1,h2'/, 'outline must derive from document headings');
+assert.match(script, /canvas\.scrollTo/, 'outline navigation must scroll only the editor canvas');
+assert.ok(!script.includes("scrollIntoView({behavior:'smooth',block:'center'})"), 'outline navigation must not scroll the whole application viewport');
+assert.match(script, /syncOutlineToScroll/, 'outline selection must follow manual scrolling');
 assert.match(css, /@media print/);
 assert.match(css, /\.paper \*\{color:#000!important;background:transparent!important/);
 console.log('Draftist feature checks passed');
