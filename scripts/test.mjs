@@ -29,6 +29,10 @@ for (const command of ['italic', 'strikeThrough', 'removeFormat', 'insertOrdered
 assert.ok(script.includes('Atkinson Hyperlegible') && script.includes('OpenDyslexic'), 'accessible font choices are missing');
 assert.match(script, /id="focus-exit"/);
 assert.match(script, /event\.key==='Escape'.*view-focus/, 'focus mode must support Escape');
+assert.match(script, /const icons = \{/);
+assert.match(script, /class="menu-icon"/);
+assert.match(script, /function rememberSelection/, 'formatting controls must preserve and reflect the editor selection');
+assert.match(script, /aria-expanded/, 'project menu must expose its open state');
 assert.match(script, /function centerTypewriterCaret/, 'typewriter mode must keep the caret centered');
 assert.match(script, /\$\$\('h1,h2'/, 'outline must derive from document headings');
 assert.match(script, /canvas\.scrollTo/, 'outline navigation must scroll only the editor canvas');
