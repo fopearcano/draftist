@@ -58,8 +58,16 @@ function toast(message) { const el=$('.toast'); el.textContent=message; el.hidde
 function updateStats() { const words=(editor.innerText.match(/\b[\w’'-]+\b/g)||[]).length; $('#word-count').textContent=`${words.toLocaleString()} words`; $('#total-words').textContent=words.toLocaleString(); $('#reading-time').textContent=`${Math.max(1,Math.ceil(words/225))} min read`; }
 function updateOutline() {
   const headings=$$('h1,h2',editor); const list=$('#outline-list');
-  list.innerHTML=headings.length?headings.map((heading,index)=>`<button class="outline-item level-${heading.tagName.toLowerCase()} ${index===0?'active':''}" data-heading="${index}"><span>${heading.tagName==='H1'?'⌄':''} ${escapeHtml(heading.textContent||'Untitled')}</span></button>`).join(''):'<p class="empty">Add headings to build your outline.</p>';
+  list.innerHTML=headings.length?headings.map((heading,index)=>`<div class="outline-row"><button class="outline-item level-${heading.tagName.toLowerCase()} ${index===0?'active':''}" data-heading="${index}"><span>${heading.tagName==='H1'?'⌄':''} ${escapeHtml(heading.textContent||'Untitled')}</span></button><button class="outline-edit" data-edit-heading="${index}" title="Rename heading" aria-label="Rename ${escapeHtml(heading.textContent||'heading')}">✎</button></div>`).join(''):'<p class="empty">Select text in the manuscript and choose Heading 1 or Heading 2 to build your outline.</p>';
   $$('.outline-item',list).forEach(button=>button.addEventListener('click',()=>navigateToHeading(headings[Number(button.dataset.heading)],button)));
+  $$('.outline-edit',list).forEach(button=>button.addEventListener('click',()=>renameHeading(headings[Number(button.dataset.editHeading)])));
+}
+function renameHeading(heading){
+  const name=prompt('Rename heading',heading.textContent);
+  if(name===null||!name.trim())return;
+  heading.textContent=name.trim();
+  updateOutline(); saveDraft();
+  toast('Heading renamed');
 }
 function navigateToHeading(heading,button){
   scrollEditorTarget(heading);
