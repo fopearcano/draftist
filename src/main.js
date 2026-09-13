@@ -33,7 +33,7 @@ root.innerHTML = `
   <div class="workspace">
     <aside class="left-panel">
       <div class="side-tabs"><button class="active" data-side="outline">Outline</button><button data-side="story">Story bible</button></div>
-      <section class="side-view" id="outline-view"><div class="section-label"><span>DOCUMENT OUTLINE</span><button id="refresh-outline">↻</button></div><nav id="outline-list"></nav><button class="subtle-action" id="add-section">＋ Add heading</button></section>
+      <section class="side-view" id="outline-view"><div class="section-label"><span>DOCUMENT OUTLINE</span><button id="refresh-outline" title="Refresh outline">↻</button></div><nav id="outline-list"></nav><div class="outline-add"><button data-add-heading="h1">＋ Chapter</button><button data-add-heading="h2">＋ Section</button></div><p class="outline-help">Edit titles here, or format text as Heading 1/2 in the manuscript.</p></section>
       <section class="side-view" id="story-view" hidden><label class="search">⌕<input id="story-search" placeholder="Search people, places…"></label><div class="tag-filters"><button class="active" data-filter="all">All</button><button data-filter="character">Characters</button><button data-filter="place">Places</button><button data-filter="object">Objects</button></div><div id="story-list"></div></section>
       <div class="project-summary"><span>PROJECT</span><strong>The Cartographer’s Daughter</strong><small><span id="total-words">0</span> words · 3 chapters</small></div>
     </aside>
@@ -54,21 +54,26 @@ let currentFilter = 'all';
 let saveTimer;
 
 function escapeHtml(value) { const node=document.createElement('div'); node.textContent=value; return node.innerHTML; }
+function escapeAttribute(value) { return escapeHtml(value).replace(/"/g,'&quot;'); }
 function toast(message) { const el=$('.toast'); el.textContent=message; el.hidden=false; clearTimeout(el.timer); el.timer=setTimeout(()=>el.hidden=true,1800); }
 function updateStats() { const words=(editor.innerText.match(/\b[\w’'-]+\b/g)||[]).length; $('#word-count').textContent=`${words.toLocaleString()} words`; $('#total-words').textContent=words.toLocaleString(); $('#reading-time').textContent=`${Math.max(1,Math.ceil(words/225))} min read`; }
 function updateOutline() {
   const headings=$$('h1,h2',editor); const list=$('#outline-list');
-  list.innerHTML=headings.length?headings.map((heading,index)=>`<div class="outline-row"><button class="outline-item level-${heading.tagName.toLowerCase()} ${index===0?'active':''}" data-heading="${index}"><span>${heading.tagName==='H1'?'⌄':''} ${escapeHtml(heading.textContent||'Untitled')}</span></button><button class="outline-edit" data-edit-heading="${index}" title="Rename heading" aria-label="Rename ${escapeHtml(heading.textContent||'heading')}">✎</button></div>`).join(''):'<p class="empty">Select text in the manuscript and choose Heading 1 or Heading 2 to build your outline.</p>';
-  $$('.outline-item',list).forEach(button=>button.addEventListener('click',()=>navigateToHeading(headings[Number(button.dataset.heading)],button)));
-  $$('.outline-edit',list).forEach(button=>button.addEventListener('click',()=>renameHeading(headings[Number(button.dataset.editHeading)])));
+  list.innerHTML=headings.length?headings.map((heading,index)=>`<div class="outline-row level-${heading.tagName.toLowerCase()}"><button class="outline-jump outline-item ${index===0?'active':''}" data-heading="${index}" title="Go to heading">${heading.tagName==='H1'?'⌄':'·'}</button><input class="outline-name" data-name-heading="${index}" value="${escapeAttribute(heading.textContent||'Untitled')}" aria-label="Edit heading title"><button class="outline-delete" data-delete-heading="${index}" title="Remove heading formatting" aria-label="Remove heading">×</button></div>`).join(''):'<p class="empty">No headings yet. Add a chapter or section below.</p>';
+  $$('.outline-jump',list).forEach(button=>button.addEventListener('click',()=>navigateToHeading(headings[Number(button.dataset.heading)],button)));
+  $$('.outline-name',list).forEach(input=>input.addEventListener('change',()=>renameHeading(headings[Number(input.dataset.nameHeading)],input.value)));
+  $$('.outline-name',list).forEach(input=>input.addEventListener('keydown',event=>{if(event.key==='Enter'){event.preventDefault();input.blur();}if(event.key==='Escape'){input.value=headings[Number(input.dataset.nameHeading)].textContent;input.blur();}}));
+  $$('.outline-delete',list).forEach(button=>button.addEventListener('click',()=>removeHeading(headings[Number(button.dataset.deleteHeading)])));
 }
-function renameHeading(heading){
-  const name=prompt('Rename heading',heading.textContent);
-  if(name===null||!name.trim())return;
+function renameHeading(heading,name){
+  if(!name.trim()){updateOutline();return;}
   heading.textContent=name.trim();
   updateOutline(); saveDraft();
   toast('Heading renamed');
 }
+function removeHeading(heading){heading.outerHTML=`<p>${escapeHtml(heading.textContent)}</p>`;updateOutline();saveDraft();toast('Heading changed to paragraph');}
+function addHeading(level){const heading=document.createElement(level);heading.textContent=level==='h1'?'New chapter':'New section';editor.append(heading,document.createElement('p'));updateOutline();updateStats();saveDraft();const headings=$$('h1,h2',editor);navigateToHeading(heading,$$('.outline-jump').at(-1));placeCaretAtEnd(heading);}
+function placeCaretAtEnd(element){editor.focus({preventScroll:true});const range=document.createRange();range.selectNodeContents(element);range.collapse(false);const selection=getSelection();selection.removeAllRanges();selection.addRange(range);}
 function navigateToHeading(heading,button){
   scrollEditorTarget(heading);
   $$('.outline-item').forEach(item=>item.classList.toggle('active',item===button));
@@ -107,7 +112,7 @@ $('#export-button').addEventListener('click',()=>{const title=$('.document-title
 $('#comments-toggle').addEventListener('click',toggleComments); $('#comments-close').addEventListener('click',toggleComments);
 $('#theme-toggle').addEventListener('click',()=>{app.dataset.theme=app.dataset.theme==='dark'?'light':'dark';});
 $('#refresh-outline').addEventListener('click',()=>{updateOutline();toast('Outline refreshed');});
-$('#add-section').addEventListener('click',()=>{editor.focus();document.execCommand('formatBlock',false,'h2');document.execCommand('insertText',false,'New section');updateOutline();saveDraft();});
+$$('[data-add-heading]').forEach(button=>button.addEventListener('click',()=>addHeading(button.dataset.addHeading)));
 $$('[data-cmd]').forEach(b=>b.addEventListener('click',()=>{document.execCommand(b.dataset.cmd);editor.focus();}));
 $('#block-format').addEventListener('change',e=>{document.execCommand('formatBlock',false,e.target.value);editor.focus();updateOutline();});
 $('#font-family').addEventListener('change',e=>{document.execCommand('fontName',false,e.target.value);editor.focus();});

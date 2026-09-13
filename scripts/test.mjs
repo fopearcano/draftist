@@ -26,6 +26,9 @@ assert.match(script, /canvas\.scrollTo/, 'outline navigation must scroll only th
 assert.ok(!script.includes("scrollIntoView({behavior:'smooth',block:'center'})"), 'outline navigation must not scroll the whole application viewport');
 assert.match(script, /syncOutlineToScroll/, 'outline selection must follow manual scrolling');
 assert.match(script, /function renameHeading/, 'outline headings must be renameable');
+assert.ok(script.includes('data-add-heading="h1"') && script.includes('data-add-heading="h2"'), 'outline must offer chapter and section creation');
+assert.match(script, /function removeHeading/, 'outline headings must be removable');
+assert.ok(!script.includes("prompt('Rename heading'"), 'heading names should be edited inline, not through a prompt');
 assert.match(css, /\.workspace,.editor-shell,.canvas\{min-height:0\}/, 'nested editor flex containers must permit canvas scrolling');
 assert.match(css, /\.workspace\{overflow:hidden\}/, 'the application viewport must remain fixed while the canvas scrolls');
 assert.match(css, /@media print/);
