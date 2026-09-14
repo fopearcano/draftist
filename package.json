@@ -1,0 +1,13 @@
+{
+  "name": "draftist",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "node scripts/server.mjs",
+    "start": "node scripts/server.mjs",
+    "build": "node scripts/build.mjs",
+    "test": "node scripts/test.mjs",
+    "doctor": "node scripts/doctor.mjs"
+  }
+}
