@@ -6,6 +6,10 @@ const packageJson = JSON.parse(await readFile(new URL('../package.json', import.
 console.log(`Draftist directory: ${process.cwd()}`);
 console.log(`Node: ${process.version}`);
 
+if (process.cwd() !== new URL('..', import.meta.url).pathname.replace(/\/$/, '')) {
+  console.warn('Note: npm was launched with a different working directory; file checks use the Draftist repository.');
+}
+
 for (const file of requiredFiles) {
   await access(new URL(`../${file}`, import.meta.url));
   console.log(`✓ ${file}`);

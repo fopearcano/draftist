@@ -38,6 +38,31 @@ start Draftist with `npm start`. If `dev` is not listed, update or re-download t
 repository; reinstalling packages will not add a missing script to an old or
 unrelated `package.json`.
 
+The shell prompt in the error is important. If it ends in a directory such as
+`novelist-codex-adapt-outliner-to-novelist-with-enhancements`, that is the
+original Novelist checkout—not this Draftist repository. Draftist's commands
+cannot be run from that folder. Keep the repositories in separate directories
+and run the command from the directory whose `package.json` has
+`"name": "draftist"`:
+
+```bash
+cd ..
+cd draftist
+node -p "require('./package.json').name"
+npm run dev
+```
+
+The third command must print `draftist`. If the Draftist directory has a
+different name, use its actual path. As an unambiguous alternative, npm accepts
+an explicit repository path from any directory:
+
+```bash
+npm --prefix /absolute/path/to/draftist run dev
+```
+
+Do not copy only `src/` into the old Novelist checkout: the Draftist
+`package.json` and `scripts/` directory are required for its development server.
+
 To use a different port temporarily, set `PORT` when starting the server:
 
 ```bash

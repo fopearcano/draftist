@@ -8,6 +8,7 @@ const [html, script, css] = await Promise.all([
 ]);
 const packageJson = JSON.parse(await readFile('package.json', 'utf8'));
 
+assert.equal(packageJson.name, 'draftist');
 assert.equal(packageJson.scripts.dev, 'node scripts/server.mjs');
 assert.equal(packageJson.scripts.start, packageJson.scripts.dev);
 assert.equal(packageJson.scripts.doctor, 'node scripts/doctor.mjs');
