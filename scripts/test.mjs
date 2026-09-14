@@ -55,6 +55,9 @@ assert.match(css, /\.workspace,.editor-shell,.canvas\{min-height:0\}/, 'nested e
 assert.match(css, /\.workspace\{overflow:hidden\}/, 'the application viewport must remain fixed while the canvas scrolls');
 assert.match(css, /\.view-expanded \.workspace/);
 assert.match(css, /\.view-inverted/);
+assert.ok(!css.includes('filter:invert('), 'inverted view must not invert the whole rendered page');
+assert.match(css, /\.view-inverted \.paper\{filter:none;background:#fff;color:#000\}/, 'light inverted view must keep black text on white');
+assert.match(css, /\.view-inverted\[data-theme=dark\] \.paper\{background:#000;color:#fff\}/, 'dark inverted view must keep white text on black');
 assert.match(css, /\.view-grayscale\{filter:grayscale\(1\)\}/);
 assert.match(css, /\.view-retro/);
 assert.match(css, /\.view-future/);
